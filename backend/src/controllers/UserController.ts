@@ -9,4 +9,11 @@ export class UserController {
     await userService.createUser(username, password);
     return res.sendStatus(StatusCodes.CREATED);
   }
+
+  static async login(req: Request, res: Response) {
+    const { username, password } = req.body;
+    const userService = new UserService();
+    const token = await userService.login(username, password);
+    return res.status(StatusCodes.OK).json({ token });
+  }
 }

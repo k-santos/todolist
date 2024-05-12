@@ -1,6 +1,9 @@
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import userRouters from "./routes/UserRoutes";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const app = express();
 app.use(bodyParser.json());
