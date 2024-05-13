@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import userRouters from "./routes/UserRoutes";
 import dotenv from "dotenv";
+import taskRouters from "./routes/TaskRoutes";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/user", userRouters);
+app.use("/task", taskRouters);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
