@@ -25,4 +25,27 @@ export class TaskService {
     });
     return task;
   }
+
+  async findTasks(username: string | undefined) {
+    const user = await prismaClient.user.findUnique({
+      where: {
+        username,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const tasks = await prismaClient.task.findMany({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    return tasks;
+  }
 }

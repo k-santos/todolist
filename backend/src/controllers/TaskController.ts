@@ -9,4 +9,11 @@ export class TaskController {
     const task = await taskService.createTask(name, type, username);
     return res.status(StatusCodes.OK).json(task);
   }
+
+  static async findTasks(req: Request, res: Response) {
+    const username = req.username;
+    const taskService = new TaskService();
+    const tasks = await taskService.findTasks(username);
+    return res.status(StatusCodes.OK).json(tasks);
+  }
 }

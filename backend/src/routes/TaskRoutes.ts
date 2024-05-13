@@ -6,4 +6,6 @@ const taskRouters = express.Router();
 
 taskRouters.post("/create/", verifyToken, TaskController.createTask);
 
+taskRouters.get("/find/", verifyToken, TaskController.findTasks);
+
 export default taskRouters;
