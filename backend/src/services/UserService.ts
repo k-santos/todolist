@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prismaClient } from "../lib/Client";
+import { User } from "@prisma/client";
 
 export class UserService {
   async createUser(username: string, password: string) {
@@ -13,20 +14,27 @@ export class UserService {
     });
   }
 
-  async login(username: string, password: string) {
+  async login(user: User, password: string) {
+    const isValid = await bcrypt.compare(password, user.password);
+    if (isValid) {
+      const token = jwt.sign(
+        { username: user.username },
+        process.env.JWT_SECRET!,
+        {
+          expiresIn: "10m",
+        }
+      );
+      return token;
+    }
+    return undefined;
+  }
+
+  async findUser(username: string) {
     const user = await prismaClient.user.findUnique({
       where: {
         username,
       },
     });
-    if (user) {
-      const isValid = await bcrypt.compare(password, user.password);
-      if (isValid) {
-        const token = jwt.sign({ username }, process.env.JWT_SECRET!, {
-          expiresIn: "10m",
-        });
-        return token;
-      }
-    }
+    return user;
   }
 }
