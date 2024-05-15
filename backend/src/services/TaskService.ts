@@ -21,23 +21,23 @@ export class TaskService {
       throw new Error("User not found");
     }
 
-    let complement: Complement | null = null;
-    if (value && unit) {
-      complement = await prismaClient.complement.create({
-        data: {
-          value,
-          unit,
-        },
-      });
-    }
-
     const task = await prismaClient.task.create({
       data: {
         name,
         userId: user.id,
-        complementId: complement ? complement.id : null,
       },
     });
+
+    if (value && unit) {
+      await prismaClient.complement.create({
+        data: {
+          value,
+          unit,
+          taskId: task.id,
+        },
+      });
+    }
+
     return task;
   }
 
@@ -61,6 +61,11 @@ export class TaskService {
       },
       include: {
         Complement: true,
+        CompletedTask: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
 
