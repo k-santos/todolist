@@ -1,8 +1,13 @@
-import { Type } from "@prisma/client";
+import { Complement } from "@prisma/client";
 import { prismaClient } from "../lib/Client";
 
 export class TaskService {
-  async createTask(name: string, type: Type, username: string | undefined) {
+  async createTask(
+    name: string,
+    username: string | undefined,
+    value?: number,
+    unit?: string
+  ) {
     const user = await prismaClient.user.findUnique({
       where: {
         username,
@@ -16,11 +21,21 @@ export class TaskService {
       throw new Error("User not found");
     }
 
+    let complement: Complement | null = null;
+    if (value && unit) {
+      complement = await prismaClient.complement.create({
+        data: {
+          value,
+          unit,
+        },
+      });
+    }
+
     const task = await prismaClient.task.create({
       data: {
         name,
-        type,
         userId: user.id,
+        complementId: complement ? complement.id : null,
       },
     });
     return task;
@@ -43,6 +58,9 @@ export class TaskService {
     const tasks = await prismaClient.task.findMany({
       where: {
         userId: user.id,
+      },
+      include: {
+        Complement: true,
       },
     });
 
