@@ -7,15 +7,16 @@ export const verifyToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.headers["authorization"];
+  const header = req.headers["authorization"];
 
-  if (!token) {
+  if (!header) {
     return res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ message: "Token not provided" });
   }
 
   try {
+    const token = header.split(" ")[1];
     const payload = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
     const username = payload.username;
     req.username = username;
