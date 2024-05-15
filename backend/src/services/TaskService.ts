@@ -66,4 +66,23 @@ export class TaskService {
 
     return tasks;
   }
+
+  async finishTask(taskId: string | undefined, value: number) {
+    const completedTask = await prismaClient.completedTask.create({
+      data: {
+        taskId,
+        value,
+      },
+    });
+    return completedTask;
+  }
+
+  async findTask(taskId: string) {
+    const task = await prismaClient.task.findUnique({
+      where: {
+        id: taskId,
+      },
+    });
+    return task;
+  }
 }
