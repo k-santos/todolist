@@ -1,6 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import api from "../api/api";
+import { FaChartBar, FaChartLine } from "react-icons/fa";
+import BarChart from "../components/barChart";
 
 export interface Task {
   id: string;
@@ -12,7 +14,9 @@ export interface Task {
 const Dashboard: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isChartOpen, setIsChartOpen] = useState<boolean>(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedChartTask, setSelectedChartTask] = useState<Task | null>(null);
   const [inputValue, setInputValue] = useState<string>("");
 
   useEffect(() => {
@@ -30,6 +34,11 @@ const Dashboard: React.FC = () => {
 
     findTasks();
   }, []);
+
+  const handleChart = async (task: Task) => {
+    setSelectedChartTask(task);
+    setIsChartOpen(true);
+  };
 
   const handleCheckboxChange = async (task: Task) => {
     if (task.idCompletedToday) {
@@ -79,6 +88,11 @@ const Dashboard: React.FC = () => {
     setInputValue("");
   };
 
+  const handleCloseChartModal = () => {
+    setIsChartOpen(false);
+    setSelectedChartTask(null);
+  };
+
   const handleFinalize = async () => {
     try {
       const response = await api.post("task/finish", {
@@ -121,6 +135,13 @@ const Dashboard: React.FC = () => {
                 </h2>
                 <p className="text-gray-500">{task.complement}</p>
               </div>
+              <button
+                onClick={() => handleChart(task)}
+                className="p-3 rounded-full bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+              >
+                {task.complement && <FaChartLine size={25} />}
+                {!task.complement && <FaChartBar size={25} />}
+              </button>
             </div>
           </li>
         ))}
@@ -152,6 +173,25 @@ const Dashboard: React.FC = () => {
                 className="px-4 py-2 bg-indigo-600 text-white rounded"
               >
                 Finalizar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isChartOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-2/4 h-2/4">
+            {selectedChartTask &&
+              selectedChartTask?.complement == undefined && (
+                <BarChart task={selectedChartTask} />
+              )}
+            <div className="flex justify-end">
+              <button
+                onClick={handleCloseChartModal}
+                className="mr-2 px-4 py-2 bg-gray-300 rounded"
+              >
+                Fechar
               </button>
             </div>
           </div>
