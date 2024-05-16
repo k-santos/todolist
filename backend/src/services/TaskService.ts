@@ -1,4 +1,3 @@
-import { Complement } from "@prisma/client";
 import { prismaClient } from "../lib/Client";
 
 export class TaskService {
@@ -82,12 +81,35 @@ export class TaskService {
     return completedTask;
   }
 
+  async undoTask(completedId: string) {
+    const deleted = await prismaClient.completedTask.delete({
+      where: {
+        id: completedId,
+      },
+    });
+
+    return deleted;
+  }
+
   async findTask(taskId: string) {
     const task = await prismaClient.task.findUnique({
       where: {
         id: taskId,
       },
     });
+    return task;
+  }
+
+  async findTaskFromCompletedId(completedId: string) {
+    const completed = await prismaClient.completedTask.findUnique({
+      where: {
+        id: completedId,
+      },
+      include: {
+        Task: true,
+      },
+    });
+    const task = completed?.Task;
     return task;
   }
 }

@@ -47,12 +47,48 @@ export class TaskController {
         .status(StatusCodes.UNAUTHORIZED)
         .json({ message: "User cannot finish task" });
     }
-    const completedTask = await taskService.finishTask(taskId, value);
+    const completedTask = await taskService.finishTask(taskId, parseInt(value));
     if (!completedTask) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
         .json({ message: "Error" });
     }
-    return res.sendStatus(StatusCodes.OK);
+    return res.status(StatusCodes.OK).json(completedTask);
+  }
+
+  static async undoTask(req: Request, res: Response) {
+    const username = req.username;
+    const { completedId } = req.body;
+    const userService = new UserService();
+    if (!username) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: "User not found" });
+    }
+    const user = await userService.findUser(username);
+    if (!user) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: "User not found" });
+    }
+    const taskService = new TaskService();
+    const task = await taskService.findTaskFromCompletedId(completedId);
+    if (!task) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: "Task not found" });
+    }
+    if (task.userId != user.id) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: "User cannot undo task" });
+    }
+    const deleted = await taskService.undoTask(completedId);
+    if (!deleted) {
+      return res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: "Error" });
+    }
+    return res.status(StatusCodes.OK).json(deleted);
   }
 }
