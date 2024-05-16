@@ -2,14 +2,18 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/api";
 
-interface Task {
+export interface Task {
   id: string;
   name: string;
   complement: string;
+  idCompletedToday?: string;
 }
 
 const Dashboard: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [inputValue, setInputValue] = useState<string>("");
 
   useEffect(() => {
     async function findTasks() {
@@ -27,7 +31,73 @@ const Dashboard: React.FC = () => {
     findTasks();
   }, []);
 
-  const handleCheckboxChange = (id: string) => {};
+  const handleCheckboxChange = async (task: Task) => {
+    if (task.idCompletedToday) {
+      try {
+        const response = await api.post("task/undo", {
+          completedId: task.idCompletedToday,
+        });
+        if (response.status === 200) {
+          const updatedTasks = tasks.map((currentTask) =>
+            currentTask.id === task.id
+              ? { ...currentTask, idCompletedToday: undefined }
+              : currentTask
+          );
+          setTasks(updatedTasks);
+        }
+      } catch (error) {
+        console.error("Error finish task:", error);
+      }
+      setSelectedTask(null);
+      return;
+    }
+    if (task.complement) {
+      setSelectedTask(task);
+      setIsModalOpen(true);
+    } else {
+      try {
+        const response = await api.post("task/finish", {
+          taskId: task.id,
+        });
+        if (response.status === 200) {
+          const updatedTasks = tasks.map((currentTask) =>
+            currentTask.id === task.id
+              ? { ...currentTask, idCompletedToday: response.data.id }
+              : currentTask
+          );
+          setTasks(updatedTasks);
+        }
+      } catch (error) {
+        console.error("Error finish task:", error);
+      }
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedTask(null);
+    setInputValue("");
+  };
+
+  const handleFinalize = async () => {
+    try {
+      const response = await api.post("task/finish", {
+        taskId: selectedTask?.id,
+        value: inputValue,
+      });
+      if (response.status === 200) {
+        const updatedTasks = tasks.map((currentTask) =>
+          currentTask.id === selectedTask?.id
+            ? { ...currentTask, idCompletedToday: response.data.id }
+            : currentTask
+        );
+        setTasks(updatedTasks);
+      }
+    } catch (error) {
+      console.error("Error finish task:", error);
+    }
+    handleCloseModal();
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -40,18 +110,53 @@ const Dashboard: React.FC = () => {
           >
             <input
               type="checkbox"
-              onChange={() => handleCheckboxChange(task.id)}
+              checked={task.idCompletedToday != undefined}
+              onChange={() => handleCheckboxChange(task)}
               className="mr-4 h-6 w-6 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
             />
-            <div className="flex-grow">
-              <h2 className="text-xl text-gray-500 font-semibold">
-                {task.name}
-              </h2>
-              <p className="text-gray-500">{task.complement}</p>
+            <div className="flex items-center flex-grow">
+              <div className="flex-grow">
+                <h2 className="text-xl text-gray-500 font-semibold mr-2">
+                  {task.name}
+                </h2>
+                <p className="text-gray-500">{task.complement}</p>
+              </div>
             </div>
           </li>
         ))}
       </ul>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Finalizar Tarefa</h2>
+            <p className="mb-4">Tarefa: {selectedTask?.name}</p>
+            <label className="block mb-2 text-gray-700">
+              {`${selectedTask?.complement.split(" ")[1]}:`}
+              <input
+                type="number"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                className="mt-1 p-2 w-full border rounded"
+              />
+            </label>
+            <div className="flex justify-end">
+              <button
+                onClick={handleCloseModal}
+                className="mr-2 px-4 py-2 bg-gray-300 rounded"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleFinalize}
+                className="px-4 py-2 bg-indigo-600 text-white rounded"
+              >
+                Finalizar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
