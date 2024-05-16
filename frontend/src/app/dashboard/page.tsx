@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import api from "../api/api";
 import { FaChartBar, FaChartLine } from "react-icons/fa";
 import BarChart from "../components/barChart";
+import LineChart from "../components/lineChart";
 
 export interface Task {
   id: string;
@@ -186,6 +187,10 @@ const Dashboard: React.FC = () => {
               selectedChartTask?.complement == undefined && (
                 <BarChart task={selectedChartTask} />
               )}
+            {selectedChartTask && selectedChartTask?.complement && (
+              <LineChart task={selectedChartTask} />
+            )}
+
             <div className="flex justify-end">
               <button
                 onClick={handleCloseChartModal}
