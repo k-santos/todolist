@@ -20,6 +20,13 @@ export class TaskController {
     return res.status(StatusCodes.OK).json(tasksResponse);
   }
 
+  static async findHistory(req: Request, res: Response) {
+    const { taskId } = req.params;
+    const taskService = new TaskService();
+    const history = await taskService.findHistory(taskId);
+    return res.status(StatusCodes.OK).json(history);
+  }
+
   static async finishTask(req: Request, res: Response) {
     const username = req.username;
     const { taskId, value } = req.body;

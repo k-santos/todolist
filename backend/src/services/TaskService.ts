@@ -61,14 +61,26 @@ export class TaskService {
       include: {
         Complement: true,
         CompletedTask: {
-          select: {
-            id: true,
+          where: {
+            created_at: {
+              gte: new Date(new Date().setHours(0, 0, 0, 0)),
+              lte: new Date(new Date().setHours(23, 59, 59, 999)),
+            },
           },
         },
       },
     });
 
     return tasks;
+  }
+
+  async findHistory(taskId: string) {
+    const history = await prismaClient.completedTask.findMany({
+      where: {
+        taskId,
+      },
+    });
+    return history;
   }
 
   async finishTask(taskId: string | undefined, value: number) {

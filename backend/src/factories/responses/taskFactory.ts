@@ -4,6 +4,7 @@ interface TaskResponse {
   id: string;
   name: string;
   complement?: string;
+  idCompletedToday?: string;
 }
 
 export class TaskFactory {
@@ -18,6 +19,7 @@ export class TaskFactory {
         id: task.id,
         name: task.name,
         complement,
+        idCompletedToday: task.CompletedTask[0]?.id,
       });
     }
     return response;

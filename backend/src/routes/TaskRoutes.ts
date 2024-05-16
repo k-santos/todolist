@@ -12,4 +12,6 @@ taskRouters.post("/undo/", verifyToken, TaskController.undoTask);
 
 taskRouters.get("/find/", verifyToken, TaskController.findTasks);
 
+taskRouters.get("/history/:taskId", verifyToken, TaskController.findHistory);
+
 export default taskRouters;
