@@ -4,10 +4,11 @@ import { prismaClient } from "../lib/Client";
 import { User } from "@prisma/client";
 
 export class UserService {
-  async createUser(username: string, password: string) {
+  async createUser(name: string, username: string, password: string) {
     const encryptedPass = await bcrypt.hash(password, 10);
     await prismaClient.user.create({
       data: {
+        name,
         username,
         password: encryptedPass,
       },

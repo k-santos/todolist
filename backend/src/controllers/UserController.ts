@@ -4,9 +4,9 @@ import { StatusCodes } from "http-status-codes";
 
 export class UserController {
   static async create(req: Request, res: Response) {
-    const { username, password } = req.body;
+    const { name, username, password } = req.body;
     const userService = new UserService();
-    await userService.createUser(username, password);
+    await userService.createUser(name, username, password);
     return res.sendStatus(StatusCodes.CREATED);
   }
 
