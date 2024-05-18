@@ -1,9 +1,14 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/UserService";
 import { StatusCodes } from "http-status-codes";
+import createUserValidator from "./validations/UserValidation";
 
 export class UserController {
   static async create(req: Request, res: Response) {
+    const validationResult = createUserValidator.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.sendStatus(400);
+    }
     const { name, username, password } = req.body;
     const userService = new UserService();
     await userService.createUser(name, username, password);
