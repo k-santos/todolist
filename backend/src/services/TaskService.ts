@@ -37,7 +37,12 @@ export class TaskService {
       });
     }
 
-    return task;
+    return {
+      name: task.name,
+      value,
+      unit,
+      userId: task.userId,
+    };
   }
 
   async findTasks(username: string | undefined) {
