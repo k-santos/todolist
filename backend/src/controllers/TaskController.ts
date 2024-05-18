@@ -3,8 +3,13 @@ import { TaskService } from "../services/TaskService";
 import { StatusCodes } from "http-status-codes";
 import { TaskFactory } from "../factories/responses/taskFactory";
 import { UserService } from "../services/UserService";
+import { createTaskValidator } from "./validations/TaskValidation";
 export class TaskController {
   static async createTask(req: Request, res: Response) {
+    const validationResult = createTaskValidator.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.sendStatus(400);
+    }
     const { name, value, unit } = req.body;
     const username = req.username;
     try {
