@@ -37,7 +37,7 @@ afterAll(async () => {
 describe("Create task endpoint", () => {
   it("should create a simple task", async () => {
     const simpleTask = {
-      name: "Simple task",
+      name: "Go to the gym",
     };
 
     const response = await request(server.getApp())
