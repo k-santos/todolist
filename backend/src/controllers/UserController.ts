@@ -14,8 +14,12 @@ export class UserController {
     }
     const { name, username, password } = req.body;
     const userService = new UserService();
-    await userService.createUser(name, username, password);
-    return res.sendStatus(StatusCodes.CREATED);
+    try {
+      await userService.createUser(name, username, password);
+      return res.sendStatus(StatusCodes.CREATED);
+    } catch (error) {
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   }
 
   static async login(req: Request, res: Response) {
@@ -25,18 +29,22 @@ export class UserController {
     }
     const { username, password } = req.body;
     const userService = new UserService();
-    const user = await userService.findUser(username);
-    if (!user) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: "User not found" });
+    try {
+      const user = await userService.findUser(username);
+      if (!user) {
+        return res
+          .status(StatusCodes.UNAUTHORIZED)
+          .json({ message: "User not found" });
+      }
+      const token = await userService.login(user, password);
+      if (!token) {
+        return res
+          .status(StatusCodes.UNAUTHORIZED)
+          .json({ message: "Invalid username or password" });
+      }
+      return res.status(StatusCodes.OK).json({ token, name: user.name });
+    } catch (error) {
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
     }
-    const token = await userService.login(user, password);
-    if (!token) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: "Invalid username or password" });
-    }
-    return res.status(StatusCodes.OK).json({ token, name: user.name });
   }
 }
