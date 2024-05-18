@@ -30,6 +30,6 @@ export class UserController {
         .status(StatusCodes.UNAUTHORIZED)
         .json({ message: "Invalid username or password" });
     }
-    return res.status(StatusCodes.OK).json({ token });
+    return res.status(StatusCodes.OK).json({ token, name: user.name });
   }
 }
