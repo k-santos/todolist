@@ -2,6 +2,7 @@ import request from "supertest";
 import { Server } from "../../Server";
 import { StatusCodes } from "http-status-codes";
 import { cleanDatabase } from "../Utils";
+import { prismaClient } from "../../lib/Client";
 
 let server: Server;
 
@@ -11,16 +12,17 @@ const user = {
   password: "password",
 };
 
-beforeAll(async () => {
-  server = new Server(3333);
-  server.start();
+beforeAll(() => {
+  server = new Server();
+});
+
+beforeEach(async () => {
   await cleanDatabase();
   await request(server.getApp()).post("/user/create").send(user);
 });
 
 afterAll(async () => {
   await cleanDatabase();
-  await server.stop();
 });
 
 describe("Login endpoint", () => {

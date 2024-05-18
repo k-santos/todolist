@@ -2,18 +2,20 @@ import request from "supertest";
 import { Server } from "../../Server";
 import { StatusCodes } from "http-status-codes";
 import { cleanDatabase } from "../Utils";
+import { prismaClient } from "../../lib/Client";
 
 let server: Server;
 
-beforeAll(async () => {
-  server = new Server(3333);
-  server.start();
+beforeAll(() => {
+  server = new Server();
+});
+
+beforeEach(async () => {
   await cleanDatabase();
 });
 
 afterAll(async () => {
   await cleanDatabase();
-  await server.stop();
 });
 
 describe("Create user endpoint", () => {
