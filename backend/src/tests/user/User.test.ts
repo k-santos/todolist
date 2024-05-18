@@ -29,4 +29,53 @@ describe("Create user endpoint", () => {
       .send(user);
     expect(response.status).toBe(StatusCodes.CREATED);
   });
+
+  it("should not create a user without name", async () => {
+    const user = {
+      username: "username",
+      password: "password",
+    };
+
+    const response = await request(server.getApp())
+      .post("/user/create")
+      .send(user);
+    expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it("should not create a user without username", async () => {
+    const user = {
+      name: "name",
+      password: "password",
+    };
+
+    const response = await request(server.getApp())
+      .post("/user/create")
+      .send(user);
+    expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it("should not create a user without password", async () => {
+    const user = {
+      name: "name",
+      username: "username",
+    };
+
+    const response = await request(server.getApp())
+      .post("/user/create")
+      .send(user);
+    expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it("should not create a user with a password shorter than 8 characters", async () => {
+    const user = {
+      name: "name",
+      username: "username",
+      password: "abcdefg",
+    };
+
+    const response = await request(server.getApp())
+      .post("/user/create")
+      .send(user);
+    expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+  });
 });
