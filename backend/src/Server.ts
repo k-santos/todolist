@@ -13,7 +13,7 @@ export class Server {
   private port: number;
   private server?: HTTPServer;
 
-  constructor(port: number) {
+  constructor(port: number = 3333) {
     this.app = express();
     this.port = port;
     this.configureMiddleware();
