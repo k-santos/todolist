@@ -2,6 +2,7 @@ import request from "supertest";
 import { Server } from "../../Server";
 import { cleanDatabase } from "../Utils";
 import { prismaClient } from "../../lib/Client";
+import { StatusCodes } from "http-status-codes";
 
 let server: Server;
 let tokenUserOne = "";
@@ -188,5 +189,25 @@ describe("Find tasks endpoint", () => {
         },
       ])
     );
+  });
+
+  it("should not find task when date is not provided", async () => {
+    const task = {
+      name: "Go to the gym",
+    };
+
+    const responseTaskCreated = await request(server.getApp())
+      .post("/task/create")
+      .set("authorization", `Bearer ${tokenUserOne}`)
+      .send(task);
+
+    let response = await request(server.getApp())
+      .get("/task/find")
+      .set("authorization", `Bearer ${tokenUserOne}`)
+      .send({
+        date: undefined,
+      });
+
+    expect(response.status).toBe(StatusCodes.BAD_REQUEST);
   });
 });
