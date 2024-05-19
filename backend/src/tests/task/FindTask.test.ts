@@ -1,0 +1,192 @@
+import request from "supertest";
+import { Server } from "../../Server";
+import { cleanDatabase } from "../Utils";
+import { prismaClient } from "../../lib/Client";
+
+let server: Server;
+let tokenUserOne = "";
+const userOne = {
+  name: "user one",
+  username: "first",
+  password: "password",
+};
+
+let tokenUserTwo = "";
+const userTwo = {
+  name: "user two",
+  username: "second",
+  password: "password",
+};
+
+beforeAll(() => {
+  server = new Server();
+});
+
+beforeEach(async () => {
+  await cleanDatabase();
+  await request(server.getApp()).post("/user/create").send(userOne);
+
+  let loginResponse = await request(server.getApp()).post("/user/login").send({
+    username: userOne.username,
+    password: userOne.password,
+  });
+  tokenUserOne = loginResponse.body.token;
+
+  await request(server.getApp()).post("/user/create").send(userTwo);
+
+  loginResponse = await request(server.getApp()).post("/user/login").send({
+    username: userTwo.username,
+    password: userTwo.password,
+  });
+  tokenUserTwo = loginResponse.body.token;
+});
+
+afterAll(async () => {
+  await cleanDatabase();
+});
+
+describe("Find tasks endpoint", () => {
+  it("should find task not yet completed", async () => {
+    const task = {
+      name: "Go to the gym",
+    };
+
+    const responseTaskCreated = await request(server.getApp())
+      .post("/task/create")
+      .set("authorization", `Bearer ${tokenUserOne}`)
+      .send(task);
+
+    let response = await request(server.getApp())
+      .get("/task/find")
+      .set("authorization", `Bearer ${tokenUserOne}`)
+      .send({
+        date: new Date(),
+      });
+
+    expect(response.body).toHaveLength(1);
+    expect(response.body).toEqual([
+      {
+        name: task.name,
+        complement: undefined,
+        id: responseTaskCreated.body.id,
+        idCompletedToday: undefined,
+      },
+    ]);
+  });
+
+  it("should find task completed", async () => {
+    const task = {
+      name: "Go to the gym",
+    };
+
+    const responseTaskCreated = await request(server.getApp())
+      .post("/task/create")
+      .set("authorization", `Bearer ${tokenUserOne}`)
+      .send(task);
+
+    await request(server.getApp())
+      .post("/task/finish")
+      .set("authorization", `Bearer ${tokenUserOne}`)
+      .send({
+        taskId: responseTaskCreated.body.id,
+        value: undefined,
+        date: new Date(),
+      });
+
+    const history = await prismaClient.completedTask.findMany({
+      where: {
+        taskId: responseTaskCreated.body.id,
+      },
+    });
+
+    expect(history).toHaveLength(1);
+
+    let response = await request(server.getApp())
+      .get("/task/find")
+      .set("authorization", `Bearer ${tokenUserOne}`)
+      .send({
+        date: new Date(),
+      });
+
+    expect(response.body).toHaveLength(1);
+    expect(response.body).toEqual([
+      {
+        name: task.name,
+        complement: undefined,
+        id: responseTaskCreated.body.id,
+        idCompletedToday: history[0].id,
+      },
+    ]);
+  });
+
+  it("should just find their own tasks", async () => {
+    const firstTaskUserOne = {
+      name: "Go to the gym",
+      value: 50,
+      unit: "min",
+    };
+
+    const secondTaskUserOne = {
+      name: "Go to the market",
+    };
+
+    const firstTaskUserOneCreated = await request(server.getApp())
+      .post("/task/create")
+      .set("authorization", `Bearer ${tokenUserOne}`)
+      .send(firstTaskUserOne);
+
+    const secondTaskUserOneCreated = await request(server.getApp())
+      .post("/task/create")
+      .set("authorization", `Bearer ${tokenUserOne}`)
+      .send(secondTaskUserOne);
+
+    const firstTaskUserTwo = {
+      name: "Go to the park",
+    };
+
+    const firstTaskUserTwoCreated = await request(server.getApp())
+      .post("/task/create")
+      .set("authorization", `Bearer ${tokenUserTwo}`)
+      .send(firstTaskUserTwo);
+
+    let response = await request(server.getApp())
+      .get("/task/find")
+      .set("authorization", `Bearer ${tokenUserOne}`)
+      .send({
+        date: new Date(),
+      });
+    expect(response.body).toHaveLength(2);
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        {
+          name: firstTaskUserOne.name,
+          complement: `${firstTaskUserOne.value} ${firstTaskUserOne.unit}`,
+          id: firstTaskUserOneCreated.body.id,
+          idCompletedToday: undefined,
+        },
+        {
+          name: secondTaskUserOne.name,
+          id: secondTaskUserOneCreated.body.id,
+          idCompletedToday: undefined,
+        },
+      ])
+    );
+
+    response = await request(server.getApp())
+      .get("/task/find")
+      .set("authorization", `Bearer ${tokenUserTwo}`)
+      .send({
+        date: new Date(),
+      });
+    expect(response.body).toHaveLength(1);
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        {
+          name: firstTaskUserTwo.name,
+          id: firstTaskUserTwoCreated.body.id,
+          idCompletedToday: undefined,
+        },
+      ])
+    );
+  });
+});
