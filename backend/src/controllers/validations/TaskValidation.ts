@@ -19,3 +19,7 @@ export const createTaskValidator = z
     }
     return true;
   });
+
+export const findTaskValidator = z.object({
+  date: z.string().pipe(z.coerce.date()),
+});
