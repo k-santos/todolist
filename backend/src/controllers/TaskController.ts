@@ -23,9 +23,13 @@ export class TaskController {
 
   static async findTasks(req: Request, res: Response) {
     try {
+      const { date } = req.body;
       const username = req.username;
       const taskService = new TaskService();
-      const tasksWithComplement = await taskService.findTasks(username);
+      const tasksWithComplement = await taskService.findTasks(
+        username,
+        new Date(date)
+      );
       const tasksResponse = TaskFactory.createTaskResponse(tasksWithComplement);
       return res.status(StatusCodes.OK).json(tasksResponse);
     } catch (error) {
@@ -46,7 +50,7 @@ export class TaskController {
 
   static async finishTask(req: Request, res: Response) {
     const username = req.username;
-    const { taskId, value } = req.body;
+    const { taskId, value, date } = req.body;
     const userService = new UserService();
     try {
       if (!username) {
@@ -74,6 +78,7 @@ export class TaskController {
       }
       const completedTask = await taskService.finishTask(
         taskId,
+        new Date(date),
         parseInt(value)
       );
       if (!completedTask) {

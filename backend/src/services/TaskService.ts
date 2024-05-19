@@ -19,7 +19,6 @@ export class TaskService {
     if (!user) {
       throw new Error("User not found");
     }
-
     const task = await prismaClient.task.create({
       data: {
         name,
@@ -38,6 +37,7 @@ export class TaskService {
     }
 
     return {
+      id: task.id,
       name: task.name,
       value,
       unit,
@@ -45,7 +45,7 @@ export class TaskService {
     };
   }
 
-  async findTasks(username: string | undefined) {
+  async findTasks(username: string | undefined, date: Date) {
     const user = await prismaClient.user.findUnique({
       where: {
         username,
@@ -68,8 +68,8 @@ export class TaskService {
         CompletedTask: {
           where: {
             created_at: {
-              gte: new Date(new Date().setHours(0, 0, 0, 0)),
-              lte: new Date(new Date().setHours(23, 59, 59, 999)),
+              gte: new Date(date.setHours(0, 0, 0, 0)),
+              lte: new Date(date.setHours(23, 59, 59, 999)),
             },
           },
         },
@@ -88,11 +88,12 @@ export class TaskService {
     return history;
   }
 
-  async finishTask(taskId: string | undefined, value: number) {
+  async finishTask(taskId: string | undefined, date: Date, value: number) {
     const completedTask = await prismaClient.completedTask.create({
       data: {
         taskId,
         value,
+        created_at: date,
       },
     });
     return completedTask;
