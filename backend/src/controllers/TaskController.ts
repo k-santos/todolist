@@ -6,6 +6,7 @@ import { UserService } from "../services/UserService";
 import {
   createTaskValidator,
   findTaskValidator,
+  finishTaskValidator,
 } from "./validations/TaskValidation";
 export class TaskController {
   static async createTask(req: Request, res: Response) {
@@ -56,8 +57,12 @@ export class TaskController {
   }
 
   static async finishTask(req: Request, res: Response) {
-    const username = req.username;
+    const validationResult = await finishTaskValidator.safeParseAsync(req.body);
+    if (!validationResult.success) {
+      return res.sendStatus(400);
+    }
     const { taskId, value, date } = req.body;
+    const username = req.username;
     const userService = new UserService();
     try {
       if (!username) {
@@ -73,12 +78,7 @@ export class TaskController {
       }
       const taskService = new TaskService();
       const task = await taskService.findTask(taskId);
-      if (!task) {
-        return res
-          .status(StatusCodes.UNAUTHORIZED)
-          .json({ message: "Task not found" });
-      }
-      if (task.userId != user.id) {
+      if (task?.userId != user.id) {
         return res
           .status(StatusCodes.UNAUTHORIZED)
           .json({ message: "User cannot finish task" });

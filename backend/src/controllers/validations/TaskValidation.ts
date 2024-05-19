@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { prismaClient } from "../../lib/Client";
 
 export const createTaskValidator = z
   .object({
@@ -23,3 +24,32 @@ export const createTaskValidator = z
 export const findTaskValidator = z.object({
   date: z.string().pipe(z.coerce.date()),
 });
+
+export const finishTaskValidator = z
+  .object({
+    date: z.string().pipe(z.coerce.date()),
+    taskId: z.string(),
+    value: z
+      .string()
+      .regex(/^\d+(\.\d+)?$/)
+      .transform(Number)
+      .or(z.number())
+      .optional(),
+  })
+  .refine(async (data) => {
+    const task = await prismaClient.task.findUnique({
+      where: {
+        id: data.taskId,
+      },
+      include: {
+        Complement: true,
+      },
+    });
+    if (!task) {
+      return false;
+    }
+    if (task.Complement?.value && !data.value) {
+      return false;
+    }
+    return true;
+  });
