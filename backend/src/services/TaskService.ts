@@ -65,9 +65,9 @@ export class TaskService {
       },
       include: {
         Complement: true,
-        CompletedTask: {
+        TaskHistory: {
           where: {
-            created_at: {
+            date: {
               gte: new Date(date.setHours(0, 0, 0, 0)),
               lte: new Date(date.setHours(23, 59, 59, 999)),
             },
@@ -80,7 +80,7 @@ export class TaskService {
   }
 
   async findHistory(taskId: string) {
-    const history = await prismaClient.completedTask.findMany({
+    const history = await prismaClient.taskHistory.findMany({
       where: {
         taskId,
       },
@@ -88,21 +88,21 @@ export class TaskService {
     return history;
   }
 
-  async finishTask(taskId: string | undefined, date: Date, value: number) {
-    const completedTask = await prismaClient.completedTask.create({
+  async finishTask(taskId: string, date: Date, value: number) {
+    const historyTask = await prismaClient.taskHistory.create({
       data: {
         taskId,
         value,
-        created_at: date,
+        date,
       },
     });
-    return completedTask;
+    return historyTask;
   }
 
-  async undoTask(completedId: string) {
-    const deleted = await prismaClient.completedTask.delete({
+  async undoTask(historyId: string) {
+    const deleted = await prismaClient.taskHistory.delete({
       where: {
-        id: completedId,
+        id: historyId,
       },
     });
 
@@ -118,16 +118,16 @@ export class TaskService {
     return task;
   }
 
-  async findTaskFromCompletedId(completedId: string) {
-    const completed = await prismaClient.completedTask.findUnique({
+  async findTaskFromHIstoryId(historyId: string) {
+    const history = await prismaClient.taskHistory.findUnique({
       where: {
-        id: completedId,
+        id: historyId,
       },
       include: {
         Task: true,
       },
     });
-    const task = completed?.Task;
+    const task = history?.Task;
     return task;
   }
 }

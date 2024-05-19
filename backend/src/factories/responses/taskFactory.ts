@@ -1,14 +1,16 @@
-import { TaskWitComplement } from "../../types/types";
+import { TaskWitComplementAndHistory } from "../../types/types";
 
 interface TaskResponse {
   id: string;
   name: string;
   complement?: string;
-  idCompletedToday?: string;
+  idHistoryToday?: string;
 }
 
 export class TaskFactory {
-  static createTaskResponse(tasks: TaskWitComplement[]): TaskResponse[] {
+  static createTaskResponse(
+    tasks: TaskWitComplementAndHistory[]
+  ): TaskResponse[] {
     const response: TaskResponse[] = [];
     for (const task of tasks) {
       let complement: string | undefined = undefined;
@@ -19,7 +21,7 @@ export class TaskFactory {
         id: task.id,
         name: task.name,
         complement,
-        idCompletedToday: task.CompletedTask[0]?.id,
+        idHistoryToday: task.TaskHistory[0]?.id,
       });
     }
     return response;

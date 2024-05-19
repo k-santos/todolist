@@ -22,26 +22,26 @@ model User {
 }
 
 model Task {
-  id            String          @id @default(uuid())
-  name          String
-  User          User?           @relation(fields: [userId], references: [id])
-  userId        String?
-  CompletedTask CompletedTask[]
-  Complement    Complement?
+  id          String        @id @default(uuid())
+  name        String
+  User        User          @relation(fields: [userId], references: [id])
+  userId      String
+  TaskHistory TaskHistory[]
+  Complement  Complement?
 }
 
 model Complement {
-  id     String @id @default(uuid())
-  value  Int
+  id     String  @id @default(uuid())
+  value  Decimal
   unit   String
-  taskId String @unique
-  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String  @unique
+  task   Task    @relation(fields: [taskId], references: [id])
 }
 
-model CompletedTask {
-  id         String   @id @default(uuid())
-  Task       Task?    @relation(fields: [taskId], references: [id])
-  taskId     String?
-  value      Int?
-  created_at DateTime @default(now())
+model TaskHistory {
+  id     String   @id @default(uuid())
+  Task   Task     @relation(fields: [taskId], references: [id])
+  taskId String
+  value  Decimal?
+  date   DateTime
 }

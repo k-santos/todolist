@@ -68,7 +68,7 @@ describe("Finish tasks endpoint", () => {
     expect(response.status).toBe(StatusCodes.OK);
     expect(response.body.taskId).toBe(responseTaskCreated.body.id);
     expect(response.body.value).toBeNull();
-    expect(response.body.created_at).toBe(date.toISOString());
+    expect(response.body.date).toBe(date.toISOString());
   });
 
   it("should finish a task with value", async () => {
@@ -95,8 +95,8 @@ describe("Finish tasks endpoint", () => {
 
     expect(response.status).toBe(StatusCodes.OK);
     expect(response.body.taskId).toBe(responseTaskCreated.body.id);
-    expect(response.body.value).toBe(task.value);
-    expect(response.body.created_at).toBe(date.toISOString());
+    expect(response.body.value).toBe(task.value.toString());
+    expect(response.body.date).toBe(date.toISOString());
   });
 
   it("should not allow a user to complete another user's task", async () => {

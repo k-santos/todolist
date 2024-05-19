@@ -70,7 +70,7 @@ describe("Find tasks endpoint", () => {
         name: task.name,
         complement: undefined,
         id: responseTaskCreated.body.id,
-        idCompletedToday: undefined,
+        idHistoryToday: undefined,
       },
     ]);
   });
@@ -94,7 +94,7 @@ describe("Find tasks endpoint", () => {
         date: new Date(),
       });
 
-    const history = await prismaClient.completedTask.findMany({
+    const history = await prismaClient.taskHistory.findMany({
       where: {
         taskId: responseTaskCreated.body.id,
       },
@@ -115,7 +115,7 @@ describe("Find tasks endpoint", () => {
         name: task.name,
         complement: undefined,
         id: responseTaskCreated.body.id,
-        idCompletedToday: history[0].id,
+        idHistoryToday: history[0].id,
       },
     ]);
   });
@@ -163,12 +163,12 @@ describe("Find tasks endpoint", () => {
           name: firstTaskUserOne.name,
           complement: `${firstTaskUserOne.value} ${firstTaskUserOne.unit}`,
           id: firstTaskUserOneCreated.body.id,
-          idCompletedToday: undefined,
+          idHistoryToday: undefined,
         },
         {
           name: secondTaskUserOne.name,
           id: secondTaskUserOneCreated.body.id,
-          idCompletedToday: undefined,
+          idHistoryToday: undefined,
         },
       ])
     );
@@ -185,7 +185,7 @@ describe("Find tasks endpoint", () => {
         {
           name: firstTaskUserTwo.name,
           id: firstTaskUserTwoCreated.body.id,
-          idCompletedToday: undefined,
+          idHistoryToday: undefined,
         },
       ])
     );

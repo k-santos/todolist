@@ -1,12 +1,14 @@
 import { Prisma } from "@prisma/client";
 
-const taskWithComplement = Prisma.validator<Prisma.TaskDefaultArgs>()({
-  include: {
-    Complement: true,
-    CompletedTask: true,
-  },
-});
+const taskWithComplementAndHistory = Prisma.validator<Prisma.TaskDefaultArgs>()(
+  {
+    include: {
+      Complement: true,
+      TaskHistory: true,
+    },
+  }
+);
 
-export type TaskWitComplement = Prisma.TaskGetPayload<
-  typeof taskWithComplement
+export type TaskWitComplementAndHistory = Prisma.TaskGetPayload<
+  typeof taskWithComplementAndHistory
 >;

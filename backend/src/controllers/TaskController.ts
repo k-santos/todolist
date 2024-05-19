@@ -83,17 +83,17 @@ export class TaskController {
           .status(StatusCodes.UNAUTHORIZED)
           .json({ message: "User cannot finish task" });
       }
-      const completedTask = await taskService.finishTask(
+      const taskHistory = await taskService.finishTask(
         taskId,
         new Date(date),
         parseInt(value)
       );
-      if (!completedTask) {
+      if (!taskHistory) {
         return res
           .status(StatusCodes.INTERNAL_SERVER_ERROR)
           .json({ message: "Error" });
       }
-      return res.status(StatusCodes.OK).json(completedTask);
+      return res.status(StatusCodes.OK).json(taskHistory);
     } catch (error) {
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
     }
@@ -101,7 +101,7 @@ export class TaskController {
 
   static async undoTask(req: Request, res: Response) {
     const username = req.username;
-    const { completedId } = req.body;
+    const { historyId } = req.body;
     const userService = new UserService();
     try {
       if (!username) {
@@ -116,7 +116,7 @@ export class TaskController {
           .json({ message: "User not found" });
       }
       const taskService = new TaskService();
-      const task = await taskService.findTaskFromCompletedId(completedId);
+      const task = await taskService.findTaskFromHIstoryId(historyId);
       if (!task) {
         return res
           .status(StatusCodes.UNAUTHORIZED)
@@ -127,7 +127,7 @@ export class TaskController {
           .status(StatusCodes.UNAUTHORIZED)
           .json({ message: "User cannot undo task" });
       }
-      const deleted = await taskService.undoTask(completedId);
+      const deleted = await taskService.undoTask(historyId);
       if (!deleted) {
         return res
           .status(StatusCodes.INTERNAL_SERVER_ERROR)
