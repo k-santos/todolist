@@ -25,6 +25,22 @@ export const findTaskValidator = z.object({
   date: z.string().pipe(z.coerce.date()),
 });
 
+export const undoTaskValidator = z
+  .object({
+    historyId: z.string(),
+  })
+  .refine(async (data) => {
+    const history = await prismaClient.taskHistory.findUnique({
+      where: {
+        id: data.historyId,
+      },
+    });
+    if (!history) {
+      return false;
+    }
+    return true;
+  });
+
 export const finishTaskValidator = z
   .object({
     date: z.string().pipe(z.coerce.date()),

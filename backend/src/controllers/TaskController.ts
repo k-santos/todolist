@@ -7,6 +7,7 @@ import {
   createTaskValidator,
   findTaskValidator,
   finishTaskValidator,
+  undoTaskValidator,
 } from "./validations/TaskValidation";
 export class TaskController {
   static async createTask(req: Request, res: Response) {
@@ -101,6 +102,10 @@ export class TaskController {
 
   static async undoTask(req: Request, res: Response) {
     const username = req.username;
+    const validationResult = await undoTaskValidator.safeParseAsync(req.body);
+    if (!validationResult.success) {
+      return res.sendStatus(400);
+    }
     const { historyId } = req.body;
     const userService = new UserService();
     try {
