@@ -28,12 +28,15 @@ export class TaskController {
 
   static async findTasks(req: Request, res: Response) {
     try {
-      const validationResult = findTaskValidator.safeParse(req.body);
+      const validationResult = findTaskValidator.safeParse(req.query);
       if (!validationResult.success) {
         return res.sendStatus(400);
       }
-      const { date } = req.body;
+      const { date } = req.query;
       const username = req.username;
+      if (typeof date !== "string") {
+        return res.sendStatus(400);
+      }
       const taskService = new TaskService();
       const tasksWithComplement = await taskService.findTasks(
         username,
