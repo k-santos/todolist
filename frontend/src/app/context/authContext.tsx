@@ -1,4 +1,5 @@
-import { createContext, useState } from "react";
+"use client";
+import { ReactNode, createContext, useState } from "react";
 import { setCookie } from "nookies";
 import api from "../api/api";
 
@@ -8,7 +9,7 @@ export type User = {
 };
 
 type AuthContextType = {
-  user: User;
+  user: User | null;
   isAuthenticated: boolean;
   signIn: (data: SignInData) => Promise<void>;
 };
@@ -20,7 +21,7 @@ type SignInData = {
 
 export const AuthContext = createContext({} as AuthContextType);
 
-export function AuthProvider({ children }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const isAuthenticated = !!user;
 
@@ -29,12 +30,15 @@ export function AuthProvider({ children }) {
       username,
       password,
     });
-    const { token, user } = response.data;
+    const { token, name } = response.data;
     setCookie(undefined, "app.token", token, {
       maxAge: 60 * 60,
     });
     api.defaults.headers["Authorization"] = `Bearer ${token}`;
-    setUser(user);
+    setUser({
+      name,
+      username,
+    });
   }
 
   return (
