@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from "../context/authContext";
 import { AxiosError } from "axios";
 import { INVALID_PASSWORD, USER_NOT_FOUND } from "../errors/constants";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export interface FieldsLogin {
@@ -12,7 +13,7 @@ export interface FieldsLogin {
   password: string;
 }
 
-function LoginForm() {
+const LoginForm: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -46,10 +47,10 @@ function LoginForm() {
 
   return (
     <div className="max-w-sm mx-auto mt-8">
-      <h1 className="text-3xl font-bold text-center mb-8">TO DO LIST</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">LOGIN</h1>
       <form onSubmit={handleSubmit(onSubmitHandler)}>
         <div className="mb-4">
-          <label htmlFor="username" className="block text-gray-700">
+          <label htmlFor="username" className="block text-white">
             Username
           </label>
           <input
@@ -66,7 +67,7 @@ function LoginForm() {
           )}
         </div>
         <div className="mb-4">
-          <label htmlFor="password" className="block text-gray-700">
+          <label htmlFor="password" className="block text-white">
             Password
           </label>
           <input
@@ -94,8 +95,14 @@ function LoginForm() {
           </div>
         )}
       </form>
+      <label className="text-white block text-center">
+        Not registered yet?{" "}
+        <Link href="/register" className="text-blue-500">
+          Register
+        </Link>
+      </label>
     </div>
   );
-}
+};
 
 export default LoginForm;
