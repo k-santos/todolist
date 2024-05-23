@@ -60,8 +60,8 @@ describe("Find tasks endpoint", () => {
     let response = await request(server.getApp())
       .get("/task/find")
       .set("authorization", `Bearer ${tokenUserOne}`)
-      .send({
-        date: new Date(),
+      .query({
+        date: new Date().toISOString(),
       });
 
     expect(response.body).toHaveLength(1);
@@ -105,8 +105,8 @@ describe("Find tasks endpoint", () => {
     let response = await request(server.getApp())
       .get("/task/find")
       .set("authorization", `Bearer ${tokenUserOne}`)
-      .send({
-        date: new Date(),
+      .query({
+        date: new Date().toISOString(),
       });
 
     expect(response.body).toHaveLength(1);
@@ -153,8 +153,8 @@ describe("Find tasks endpoint", () => {
     let response = await request(server.getApp())
       .get("/task/find")
       .set("authorization", `Bearer ${tokenUserOne}`)
-      .send({
-        date: new Date(),
+      .query({
+        date: new Date().toISOString(),
       });
     expect(response.body).toHaveLength(2);
     expect(response.body).toEqual(
@@ -176,8 +176,8 @@ describe("Find tasks endpoint", () => {
     response = await request(server.getApp())
       .get("/task/find")
       .set("authorization", `Bearer ${tokenUserTwo}`)
-      .send({
-        date: new Date(),
+      .query({
+        date: new Date().toISOString(),
       });
     expect(response.body).toHaveLength(1);
     expect(response.body).toEqual(
@@ -204,7 +204,7 @@ describe("Find tasks endpoint", () => {
     let response = await request(server.getApp())
       .get("/task/find")
       .set("authorization", `Bearer ${tokenUserOne}`)
-      .send({
+      .query({
         date: undefined,
       });
 
