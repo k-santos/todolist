@@ -10,10 +10,10 @@ interface LineChartProps {
   task: Task;
 }
 
-interface Historic {
+interface History {
   id: string;
   taskId: string;
-  created_at: Date;
+  date: Date;
   value: number;
 }
 
@@ -61,16 +61,16 @@ const LineChart: React.FC<LineChartProps> = ({ task }) => {
   useEffect(() => {
     async function findHistoric() {
       try {
-        const response = await api.get(`task/historic/${task.id}`);
-        const historic: Historic[] = response.data.map((his: Historic) => ({
+        const response = await api.get(`task/history/${task.id}`);
+        const historic: History[] = response.data.map((his: History) => ({
           ...his,
-          created_at: new Date(his.created_at),
+          date: new Date(his.date),
         }));
         const value = getLastWeek().map((date) => {
           const hist = historic.find(
             (his) =>
-              his.created_at.getDate() == date.getDate() &&
-              his.created_at.getMonth() == date.getMonth()
+              his.date.getDate() == date.getDate() &&
+              his.date.getMonth() == date.getMonth()
           );
           if (hist) {
             return hist.value;
@@ -79,7 +79,7 @@ const LineChart: React.FC<LineChartProps> = ({ task }) => {
         });
         setValue(value);
       } catch (error) {
-        console.error("Error find historic:", error);
+        console.error("Error find history:", error);
       }
     }
     findHistoric();

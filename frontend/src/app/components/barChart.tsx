@@ -6,21 +6,22 @@ import { Task } from "../dashboard/page";
 
 Chart.register(...registerables);
 
-interface Historic {
+interface History {
   id: string;
   taskId: string;
-  created_at: Date;
+  date: Date;
   value?: string;
 }
 
 interface BarChartProps {
   task: Task;
+  baseDate: Date;
 }
 
-const BarChart: React.FC<BarChartProps> = ({ task }) => {
+const BarChart: React.FC<BarChartProps> = ({ task, baseDate }) => {
   const [value, setValue] = useState<number[]>([0, 0, 0, 0, 0, 0, 0]);
 
-  const formattedLabels = getLastWeek().map((date) => {
+  const formattedLabels = getLastWeek(baseDate).map((date) => {
     const day = date.getDate();
     const month = date.getMonth() + 1;
     return `${day}/${month}`;
@@ -30,7 +31,7 @@ const BarChart: React.FC<BarChartProps> = ({ task }) => {
     labels: formattedLabels,
     datasets: [
       {
-        label: "Tarefa Feita",
+        label: "Done",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 1,
@@ -55,16 +56,16 @@ const BarChart: React.FC<BarChartProps> = ({ task }) => {
   useEffect(() => {
     async function findHistoric() {
       try {
-        const response = await api.get(`task/historic/${task.id}`);
-        const historic: Historic[] = response.data.map((his: Historic) => ({
+        const response = await api.get(`task/history/${task.id}`);
+        const history: History[] = response.data.map((his: History) => ({
           ...his,
-          created_at: new Date(his.created_at),
+          date: new Date(his.date),
         }));
-        const value = getLastWeek().map((date) => {
-          return historic.find(
+        const value = getLastWeek(baseDate).map((date) => {
+          return history.find(
             (his) =>
-              his.created_at.getDate() == date.getDate() &&
-              his.created_at.getMonth() == date.getMonth()
+              his.date.getDate() == date.getDate() &&
+              his.date.getMonth() == date.getMonth()
           )
             ? 1
             : 0;
@@ -85,13 +86,13 @@ const BarChart: React.FC<BarChartProps> = ({ task }) => {
   );
 };
 
-function getLastWeek(): Date[] {
+function getLastWeek(baseDate: Date): Date[] {
   const dates: Date[] = [];
-  const today = new Date();
+  const copy = new Date(baseDate);
   for (let i = 0; i < 7; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-    dates.push(date);
+    const newDate = new Date(copy);
+    newDate.setDate(copy.getDate() - i);
+    dates.push(newDate);
   }
   dates.reverse();
   return dates;
