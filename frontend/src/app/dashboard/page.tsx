@@ -7,6 +7,7 @@ import LineChart from "../components/lineChart";
 import { Header } from "../components/hearder";
 import { AuthContext } from "../context/authContext";
 import { format } from "date-fns/format";
+import { useRouter } from "next/navigation";
 
 export interface Task {
   id: string;
@@ -24,6 +25,7 @@ const Dashboard: React.FC = () => {
   const [selectedChartTask, setSelectedChartTask] = useState<Task | null>(null);
   const [inputValue, setInputValue] = useState<string>("");
   const { user } = useContext(AuthContext);
+  const router = useRouter();
 
   async function findTasks() {
     try {
@@ -40,6 +42,12 @@ const Dashboard: React.FC = () => {
       console.error("Error fetching tasks:", error);
     }
   }
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/");
+    }
+  }, [user, router]);
 
   useEffect(() => {
     setBaseDate(new Date());
