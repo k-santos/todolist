@@ -47,4 +47,27 @@ export class UserController {
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
+  static async findUser(req: Request, res: Response) {
+    const userService = new UserService();
+    const username = req.username;
+    try {
+      if (!username) {
+        return res
+          .status(StatusCodes.UNAUTHORIZED)
+          .json({ message: "User not found" });
+      }
+      const user = await userService.findUser(username);
+      if (!user) {
+        return res
+          .status(StatusCodes.UNAUTHORIZED)
+          .json({ message: "User not found" });
+      }
+      return res
+        .status(StatusCodes.OK)
+        .json({ name: user.name, username: user.username });
+    } catch (error) {
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
