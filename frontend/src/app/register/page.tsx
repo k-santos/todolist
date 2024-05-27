@@ -51,7 +51,7 @@ function RegisterForm() {
       <h1 className="text-3xl font-bold text-center mb-8">REGISTER</h1>
       <form onSubmit={handleSubmit(onSubmitHandler)}>
         <div className="mb-4">
-          <label htmlFor="name" className="block text-gray-700">
+          <label htmlFor="name" className="block text-white">
             Name
           </label>
           <input
@@ -69,7 +69,7 @@ function RegisterForm() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="username" className="block text-gray-700">
+          <label htmlFor="username" className="block text-white">
             Username
           </label>
           <input
@@ -87,7 +87,7 @@ function RegisterForm() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="password" className="block text-gray-700">
+          <label htmlFor="password" className="block text-white">
             Password
           </label>
           <input
@@ -105,7 +105,7 @@ function RegisterForm() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="confirmPassword" className="block text-gray-700">
+          <label htmlFor="confirmPassword" className="block text-white">
             Confirm password
           </label>
           <input
