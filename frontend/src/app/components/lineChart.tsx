@@ -8,6 +8,7 @@ Chart.register(...registerables);
 
 interface LineChartProps {
   task: Task;
+  baseDate: Date;
 }
 
 interface History {
@@ -17,10 +18,10 @@ interface History {
   value: number;
 }
 
-const LineChart: React.FC<LineChartProps> = ({ task }) => {
+const LineChart: React.FC<LineChartProps> = ({ task, baseDate }) => {
   const [value, setValue] = useState<number[]>([0, 0, 0, 0, 0, 0, 0]);
 
-  const formattedLabels = getLastWeek().map((date) => {
+  const formattedLabels = getLastWeek(baseDate).map((date) => {
     const day = date.getDate();
     const month = date.getMonth() + 1;
     return `${day}/${month}`;
@@ -30,14 +31,14 @@ const LineChart: React.FC<LineChartProps> = ({ task }) => {
     labels: formattedLabels,
     datasets: [
       {
-        label: "Meu desempenho",
+        label: "My progress",
         data: value,
         fill: false,
         borderColor: "rgb(75, 192, 192)",
         tension: 0.1,
       },
       {
-        label: "Meta",
+        label: "Goal",
         data: Array(formattedLabels.length).fill(target),
         fill: false,
         borderColor: "rgb(255, 99, 132)",
@@ -66,7 +67,7 @@ const LineChart: React.FC<LineChartProps> = ({ task }) => {
           ...his,
           date: new Date(his.date),
         }));
-        const value = getLastWeek().map((date) => {
+        const value = getLastWeek(baseDate).map((date) => {
           const hist = historic.find(
             (his) =>
               his.date.getDate() == date.getDate() &&
@@ -93,13 +94,13 @@ const LineChart: React.FC<LineChartProps> = ({ task }) => {
   );
 };
 
-function getLastWeek(): Date[] {
+function getLastWeek(baseDate: Date): Date[] {
   const dates: Date[] = [];
-  const today = new Date();
+  const copy = new Date(baseDate);
   for (let i = 0; i < 7; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-    dates.push(date);
+    const newDate = new Date(copy);
+    newDate.setDate(copy.getDate() - i);
+    dates.push(newDate);
   }
   dates.reverse();
   return dates;

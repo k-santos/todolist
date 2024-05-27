@@ -218,22 +218,21 @@ const Dashboard: React.FC = () => {
         {isChartOpen && baseDate && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="w-2/4 h-2/4">
+              <div className="flex justify-end">
+                <button
+                  onClick={handleCloseChartModal}
+                  className="mr-2 px-4 py-2 text-black bg-gray-300 rounded"
+                >
+                  Close
+                </button>
+              </div>
               {selectedChartTask &&
                 selectedChartTask?.complement == undefined && (
                   <BarChart task={selectedChartTask} baseDate={baseDate} />
                 )}
               {selectedChartTask && selectedChartTask?.complement && (
-                <LineChart task={selectedChartTask} />
+                <LineChart task={selectedChartTask} baseDate={baseDate} />
               )}
-
-              <div className="flex justify-end">
-                <button
-                  onClick={handleCloseChartModal}
-                  className="mr-2 px-4 py-2 bg-gray-300 rounded"
-                >
-                  Fechar
-                </button>
-              </div>
             </div>
           </div>
         )}
