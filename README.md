@@ -1,6 +1,6 @@
 <h1>Running the App</h1>
-
 <h3>Backend</h3>
+<p> Before running the commands, you should assign the value of the database-related information in the .env and docker-compose.yaml files. You should also assign the value of the JWT_SECRET in .env file. </p>
 <pre><code>
 $ cd backend
 $ npm install
@@ -17,6 +17,21 @@ $ cd frontend
 $ npm install
 $ npm run dev
 </code></pre>
+
+<h1>Running the tests</h1>
+
+<h3>Backend</h3>
+The backend needs a database to execute tests.
+<pre><code>
+$ docker compose up -d
+$ npm test
+</code></pre>
+
+<h3>Frontend</h3>
+<pre><code>
+$ npm test
+</code></pre>
+
 
 <h1>Some Technologies Used in the Frontend</h1>
 <ul>
